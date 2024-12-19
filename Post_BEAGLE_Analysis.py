@@ -1072,25 +1072,25 @@ class Beagle_Output(dict):
         '''
         
         # Construct wavelength grid (x is an array of wavelengths with equal separations in R space)
-        print('generating grid')
+        #print('generating grid')
         wav_obs_fine = [0.95*model_wave[0]]
         while wav_obs_fine[-1] < 1.05*model_wave[-1]:
             R_val = np.interp(wav_obs_fine[-1], r_wave, r_curve)
             dwav = wav_obs_fine[-1]/np.abs(R_val)/oversample
             wav_obs_fine.append(wav_obs_fine[-1] + dwav)
-        print('done_generating grid')
+        #print('done_generating grid')
         wav_obs_fine = np.array(wav_obs_fine)
 
-        print('interpolating model onto grid')
+        #print('interpolating model onto grid')
         # Construct your model on the grid of wavelengths you defined above 
         model = interp1d(model_wave, model_flux, 
                          bounds_error=False, fill_value='extrapolate')
         
         flux_fine = model(wav_obs_fine)
 
-        plt.figure()
-        plt.plot(wav_obs_fine, flux_fine)
-        plt.show()
+        # plt.figure()
+        # plt.plot(wav_obs_fine, flux_fine)
+        # plt.show()
         
         # Convolve with the resolution curve
         sigma_pix = oversample/2.35/f_LSF  # sigma width of kernel in pixels
@@ -1104,7 +1104,7 @@ class Beagle_Output(dict):
         # Downsample to the wavelength grid of the instrument (here I used Adam Carnall's spectres package) 
         #need to map onto actual observed spectral data
 
-        print('Downsampling')
+        #print('Downsampling')
         flux = spectres.spectres(wave_obs_spectra, wav_obs_fine, flux_fine, fill=0, verbose=False)
 
         return flux
