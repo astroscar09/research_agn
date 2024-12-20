@@ -1078,6 +1078,7 @@ class Beagle_Output(dict):
             R_val = np.interp(wav_obs_fine[-1], r_wave, r_curve)
             dwav = wav_obs_fine[-1]/np.abs(R_val)/oversample
             wav_obs_fine.append(wav_obs_fine[-1] + dwav)
+            
         #print('done_generating grid')
         wav_obs_fine = np.array(wav_obs_fine)
 
@@ -1098,7 +1099,8 @@ class Beagle_Output(dict):
         x_kernel_pix = np.arange(-k_size, k_size+1) 
         kernel = np.exp(-(x_kernel_pix**2)/(2*sigma_pix**2)) # construct Gaussian kernel
         kernel /= np.trapz(kernel)  # Explicitly normalise kernel
-        print('performing the convolution')
+        
+        #print('performing the convolution')
         flux_fine = convolve(flux_fine, kernel)
         
         # Downsample to the wavelength grid of the instrument (here I used Adam Carnall's spectres package) 
@@ -1110,7 +1112,7 @@ class Beagle_Output(dict):
         return flux
 
 
-    def generate_convolved_spectra(self, r_wave, r_curve, obs_wave):
+    def generate_convolved_spectra(self, r_wave, r_curve, obs_wave, oversample):
         
         #r_wave, r_curve, model_wave, model_flux, wave_obs_spectra
         redshift = self['gal_prop']['redshift']
@@ -1134,9 +1136,11 @@ class Beagle_Output(dict):
             model_flux = in_range_flux[i]
             model_agn  = in_range_agn[i]
             
-            convolved_flux[i] = self.convolve_model_spec(r_wave, r_curve, model_wav, model_flux, obs_wave)
-            convolved_agn[i] = self.convolve_model_spec(r_wave, r_curve, model_wav, model_agn, obs_wave)
+            convolved_flux[i] = self.convolve_model_spec(r_wave, r_curve, model_wav, model_flux, obs_wave, oversample)
+            convolved_agn[i] = self.convolve_model_spec(r_wave, r_curve, model_wav, model_agn, obs_wave, oversample)
 
+        print(convolved_flux.shape)
+        print(convolved_flux)
         self['convolved_spectra']   = convolved_flux
         self['convolved_agn']       = convolved_agn
         self['convolved_wave']      = obs_wave
